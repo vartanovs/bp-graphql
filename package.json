@@ -1,0 +1,25 @@
+{
+  "name": "graphql-server-boilerplate",
+  "version": "1.0.0",
+  "description": "GraphQL Server Boilerplate",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vartanovs/graphql-server-boilerplate.git"
+  },
+  "keywords": [
+    "GraphQL",
+    "PostgreSQL",
+    "Node",
+    "Jest"
+  ],
+  "author": "Serge Vartanov <vartanov.s@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vartanovs/graphql-server-boilerplate/issues"
+  },
+  "homepage": "https://github.com/vartanovs/graphql-server-boilerplate#readme"
+}
