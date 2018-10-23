@@ -2,8 +2,9 @@
   "name": "graphql-server-boilerplate",
   "version": "1.0.0",
   "description": "GraphQL Server Boilerplate",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
+    "start": "nodemon --exec ts-node src/index.ts",
     "test": "jest"
   },
   "repository": {
@@ -21,5 +22,21 @@
   "bugs": {
     "url": "https://github.com/vartanovs/graphql-server-boilerplate/issues"
   },
-  "homepage": "https://github.com/vartanovs/graphql-server-boilerplate#readme"
+  "homepage": "https://github.com/vartanovs/graphql-server-boilerplate#readme",
+  "dependencies": {
+    "graphql-yoga": "^1.16.7",
+    "pg": "^7.5.0",
+    "reflect-metadata": "^0.1.12",
+    "typeorm": "^0.2.8",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.0",
+    "jest": "^23.6.0",
+    "nodemon": "^1.18.4",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.1.3"
+  }
 }

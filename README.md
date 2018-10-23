@@ -7,7 +7,7 @@ Persistent data is stored in a PostgreSQL database.
 ### Programming Language
 * Typescript
 
-# RunTime Environment
+### RunTime Environment
 * Node.js
 
 ### Database / ORM
