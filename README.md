@@ -14,5 +14,8 @@ Persistent data is stored in a PostgreSQL database.
 * PostgreSQL 
 * TypeORM
 
+### Encryption
+* bcrypt
+
 ### Testing
 * Jest

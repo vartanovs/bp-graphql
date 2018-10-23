@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "nodemon --exec ts-node src/index.ts",
+    "gen-schema-types": "gql2ts src/schema.graphql -o src/types/schema.d.ts",
     "test": "jest"
   },
   "repository": {
@@ -24,6 +25,8 @@
   },
   "homepage": "https://github.com/vartanovs/graphql-server-boilerplate#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "graphql-import": "^0.7.1",
     "graphql-yoga": "^1.16.7",
     "pg": "^7.5.0",
     "reflect-metadata": "^0.1.12",
@@ -31,7 +34,10 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/node": "^10.12.0",
+    "@types/uuid": "^3.4.4",
+    "gql2ts": "^1.10.1",
     "jest": "^23.6.0",
     "nodemon": "^1.18.4",
     "ts-node": "^7.0.1",
