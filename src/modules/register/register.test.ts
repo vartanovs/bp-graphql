@@ -1,7 +1,8 @@
 import { request } from 'graphql-request';
-import { User } from '../entity/User';
+import { User } from '../../entity/User';
 
-import { startServer } from '../start-server';
+import { startServer } from '../../start-server';
+
 // import { createTypeOrmConn } from '../utils/createTypeOrmConn';
 // TODO: Find a way to close the TypeORM Connection as well as the server
 
@@ -9,7 +10,10 @@ const email = "test1@test.com";
 const password = "secretpass";
 
 const mutation = `mutation { 
-  register(email: "${email}", password: "${password}")
+  register(email: "${email}", password: "${password}") {
+    path
+    message
+  }
 }`;
 
 let getHost = () => '';
@@ -25,9 +29,9 @@ describe('Feature: User Registration', () => {
     // dbConnection = await createTypeOrmConn();
     done();
   })
-  test('User registration returns true', async (done) => {
+  test('Successful user registration returns null', async (done) => {
     const response = await request(getHost(), mutation);
-    expect(response).toEqual({ register: true});
+    expect(response).toEqual({ register: null });
     done();
   });
   test('AND one matching user by email is found in the database', async (done) => {
@@ -41,6 +45,12 @@ describe('Feature: User Registration', () => {
     const users = await User.find({ where: { email } });
     const user = users[0];
     expect(user.password).not.toEqual(password);
+    done();
+  });
+  test('BUT duplicate user registration returns error', async (done) => {
+    const response: any = await request(getHost(), mutation);
+    expect(response.register).toHaveLength(1);
+    expect(response.register[0].path).toEqual('email');
     done();
   });
   afterAll(async done => {
