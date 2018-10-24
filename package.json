@@ -4,9 +4,9 @@
   "description": "GraphQL Server Boilerplate",
   "main": "src/index.ts",
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts",
     "gen-schema-types": "gql2ts src/schema.graphql -o src/types/schema.d.ts",
-    "test": "jest"
+    "start": "NODE_ENV=dev nodemon --exec ts-node src/index.ts",
+    "test": "NODE_ENV=test jest --detectOpenHandles",
   },
   "repository": {
     "type": "git",
