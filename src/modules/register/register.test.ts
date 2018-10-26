@@ -34,14 +34,14 @@ describe('Feature: User Registration - Success', () => {
     done();
   });
   test('AND one matching user by email is found in the database', async (done) => {
-    const users = await User.find({ where: { goodEmail } });
+    const users = await User.find({ where: { email: goodEmail } });
     expect(users).toHaveLength(1);
     const user = users[0];
     expect(user.email).toEqual(goodEmail);
     done();
   });
   test('AND matching user hashed password does not equal clear password', async (done) => {
-    const users = await User.find({ where: { goodEmail } });
+    const users = await User.find({ where: { email: goodEmail } });
     const user = users[0];
     expect(user.password).not.toEqual(goodPassword);
     done();

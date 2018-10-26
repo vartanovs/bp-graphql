@@ -1,16 +1,11 @@
 import { AddressInfo } from 'net';
 
-import { GraphQLSchema } from 'graphql';
 import { GraphQLServer } from 'graphql-yoga';
-import { importSchema } from 'graphql-import';
-import { mergeSchemas, makeExecutableSchema } from 'graphql-tools';
-
-import * as fs from 'fs';
-import * as path from 'path';
 
 import { redis } from './startRedis';
 import { confirmEmail } from './routes/confirmEmail';
 import { Response } from 'express';
+import { genSchema } from './utils/genSchema';
 
 // import { createTypeOrmConn } from './utils/createTypeOrmConn';
 
@@ -19,21 +14,10 @@ import { Response } from 'express';
  * TODO: Refactor to remove side-effects
  */
 export const startServer = async () => {
-  // Declare empty array to hold GraphQL Schemas
-  const schemas: GraphQLSchema[] = [];
-  // Create folders array which holds the names of all module folders
-  const folders: string[] = fs.readdirSync(path.join(__dirname, './modules'));
-  // Loop through folders, pushing an executable schema (resolver + typedef) into schemas array
-  folders.forEach((folder) => {
-    const { resolvers } = require(`./modules/${folder}/resolvers`);
-    const typeDefs = importSchema(path.join(__dirname, `./modules/${folder}/schema.graphql`))
-    schemas.push(makeExecutableSchema({ resolvers, typeDefs }))
-  })
-
   // Establish new GraphQL Server (graphql-yoga)
   const server= new GraphQLServer({
     // Pass merged executable schemas as schema
-    schema: mergeSchemas({ schemas }),
+    schema: genSchema(),
     // Pass redis and url as context to use in resolver
     context: ({ request }) => ({
       redis,
