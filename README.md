@@ -11,6 +11,7 @@ Persistent data is stored in a PostgreSQL database.
 * Node.js
 
 ### Database / ORM
+* Redis
 * PostgreSQL 
 * TypeORM
 

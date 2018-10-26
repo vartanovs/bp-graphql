@@ -1,4 +1,6 @@
 module.exports = {
+  // globalSetup: "./src/testSetup/callSetup.js",
+  // globalTeardown: "./src/testSetup/callTeardown.js",
   transform: {
       "^.+\\.tsx?$": "ts-jest",
   },

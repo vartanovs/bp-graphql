@@ -6,3 +6,6 @@ typings/
 
 # Dotenv environment variables file
 .env
+
+# Redis Persistance File
+dump.rdb

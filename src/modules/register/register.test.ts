@@ -2,10 +2,13 @@ import { request } from 'graphql-request';
 import { User } from '../../entity/User';
 
 import { errorMessages } from './errorMessages';
+import { createTypeOrmConn } from '../../utils/createTypeOrmConn';
 import { startServer } from '../../start-server';
+import { Connection } from 'typeorm';
+import { Server as HttpServer } from 'http';
+import { Server as HttpsServer } from 'https';
 
-// import { createTypeOrmConn } from '../utils/createTypeOrmConn';
-// TODO: Find a way to close the TypeORM Connection as well as the server
+// TODO: Migrate server opening to global jest setup
 
 const goodEmail = "test1@test.com";
 const goodPassword = "secretpass";
@@ -20,28 +23,24 @@ const mutation = (email: string, password: string) => `mutation {
   }
 }`;
 
-let getHost = () => '';
+let app: HttpServer | HttpsServer;
+let db: Connection;
 
-// TODO: Specify type for dbConnection
-let app: any;
-
-// Start server before testing / close server after testing
-beforeAll(async done => {
+beforeAll(async (done) => {
   app = await startServer();
-  const { port } = app.address();
-  getHost = () => `http://127.0.0.1:${port}`
-  // dbConnection = await createTypeOrmConn();
+  db = await createTypeOrmConn();
   done();
-})
+});
 
-afterAll(async done => {
-  await app.close();;
+afterAll(async (done) => {
+  await db.close();
+  await app.close();
   done();
-})
+});
 
 describe('Feature: User Registration - Success', () => {
   test('Successful user registration returns null', async (done) => {
-    const response = await request(getHost(), mutation(goodEmail, goodPassword));
+    const response = await request(process.env.HOST as string, mutation(goodEmail, goodPassword));
     expect(response).toEqual({ register: null });
     done();
   });
@@ -63,7 +62,7 @@ describe('Feature: User Registration - Success', () => {
 
 describe('Feature: User Registration - Failure', () => {
   test('AND duplicate user registration returns error', async (done) => {
-    const response: any = await request(getHost(), mutation(goodEmail, goodPassword));
+    const response: any = await request(process.env.HOST as string, mutation(goodEmail, goodPassword));
     expect(response.register[0]).toEqual({
       path: 'email',
       message: errorMessages.duplicateEmail,
@@ -71,7 +70,7 @@ describe('Feature: User Registration - Failure', () => {
     done();
   });
   test('AND password below 3 characters returns error', async (done) => {
-    const response: any = await request(getHost(), mutation(goodEmail, shortPassword));
+    const response: any = await request(process.env.HOST as string, mutation(goodEmail, shortPassword));
     expect(response.register[0]).toEqual({
       path: 'password',
       message: errorMessages.passwordTooShort,
@@ -79,7 +78,7 @@ describe('Feature: User Registration - Failure', () => {
     done();
   });
   test('AND email address below 3 characters returns two errors', async (done) => {
-    const response: any = await request(getHost(), mutation(shortEmail, goodPassword));
+    const response: any = await request(process.env.HOST as string, mutation(shortEmail, goodPassword));
     expect(response.register).toEqual([
       {
         path: 'email',
@@ -93,7 +92,7 @@ describe('Feature: User Registration - Failure', () => {
     done();
   });
   test('AND short email and password returns three errors', async (done) => {
-    const response: any = await request(getHost(), mutation(shortEmail, shortPassword));
+    const response: any = await request(process.env.HOST as string, mutation(shortEmail, shortPassword));
     expect(response.register).toEqual([
       {
         path: 'email',

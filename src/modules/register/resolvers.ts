@@ -8,6 +8,7 @@ import GQL from '../../types/schema';
 
 import { errorMessages } from './errorMessages';
 import { formatYupError } from '../../utils/formatYupError';
+import { createConfirmEmailLink } from '../../utils/createConfirmEmailLink';
 
 const SALT = 12;
 
@@ -30,7 +31,7 @@ export const resolvers: ResolverMap = {
   },
 
   Mutation: {
-    register: async (_, args: GQL.IRegisterOnMutationArguments) => {
+    register: async (_, args: GQL.IRegisterOnMutationArguments, { redis, url }) => {
       // Validate arguments
       try {
         await schema.validate(args, {abortEarly: false});
@@ -61,7 +62,13 @@ export const resolvers: ResolverMap = {
         email,
         password: hashPassword
       });
+
+      // Save user to database
       await user.save();
+
+      // Create 'Confirm Email Link' to send to user
+      await createConfirmEmailLink(url, user.id, redis);
+
       return null;
     }
   }
