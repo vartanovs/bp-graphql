@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 // Confirm Email - https://url/confirm/<id>
 
 /**
- * Generate a custom Email Link for user to confimr their password
+ * Generate a custom Email Link for user to confirm their password
  * @param {string} url Domain URL user clicked on to register (ex: localhost:4000)
  * @param {string} userId User ID stored in PSQL Database
  * @param {Redis} redis Redis object for session storage

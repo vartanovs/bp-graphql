@@ -2,15 +2,12 @@ import { request } from 'graphql-request';
 import { User } from '../../entity/User';
 
 import { errorMessages } from './errorMessages';
-import { createTypeOrmConn } from '../../utils/createTypeOrmConn';
-import { startServer } from '../../start-server';
+import { createTypeOrmConn } from '../../startTypeOrm';
 import { Connection } from 'typeorm';
-import { Server as HttpServer } from 'http';
-import { Server as HttpsServer } from 'https';
 
-// TODO: Migrate server opening to global jest setup
+let db: Connection;
 
-const goodEmail = "test1@test.com";
+const goodEmail = "test@register.com";
 const goodPassword = "secretpass";
 
 const shortEmail = 'ts';
@@ -23,20 +20,12 @@ const mutation = (email: string, password: string) => `mutation {
   }
 }`;
 
-let app: HttpServer | HttpsServer;
-let db: Connection;
-
 beforeAll(async (done) => {
-  app = await startServer();
   db = await createTypeOrmConn();
   done();
-});
+})
 
-afterAll(async (done) => {
-  await db.close();
-  await app.close();
-  done();
-});
+afterAll(() => db.close());
 
 describe('Feature: User Registration - Success', () => {
   test('Successful user registration returns null', async (done) => {

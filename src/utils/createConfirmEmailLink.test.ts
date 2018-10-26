@@ -1,40 +1,38 @@
-import * as Redis from 'ioredis';
 import fetch from 'node-fetch';
 
-import { createConfirmEmailLink } from "./createConfirmEmailLink";
-import { createTypeOrmConn } from "./createTypeOrmConn";
-import { startServer } from '../start-server';
-import { Connection } from 'typeorm';
-import { Server as HttpServer } from 'http';
-import { Server as HttpsServer } from 'https';
-import { User } from "../entity/User";
+import { request } from 'graphql-request';
 
-let app: HttpServer | HttpsServer;
+import { createConfirmEmailLink } from "./createConfirmEmailLink";
+import { User } from "../entity/User";
+import { redis } from '../startRedis';
+import { createTypeOrmConn } from '../startTypeOrm';
+import { Connection } from 'typeorm';
+
 let db: Connection;
-let badUrl: string;
+
 let goodUrl: string;
 let userId: string;
 
-const goodEmail: string = 'test1@test.com';
+const goodEmail: string = 'test@confirm.com';
 const goodPassword: string = 'secretpass';
-const redis: Redis.Redis = new Redis();
+
+const mutation = (email: string, password: string) => `mutation { 
+  register(email: "${email}", password: "${password}") {
+    path
+    message
+  }
+}`;
 
 beforeAll(async (done) => {
-  app = await startServer();
+  request
   db = await createTypeOrmConn();
-  const user = await User.create({
-    email: goodEmail,
-    password: goodPassword,
-  }).save();
-  userId = user.id;
+  await request(process.env.HOST as string, mutation(goodEmail, goodPassword))  
+  const users = await User.find({ where: { goodEmail } });
+  userId = users[0].id;
   done();
 });
 
-afterAll(async (done) => {
-  await db.close();
-  await app.close();
-  done();
-});
+afterAll(() => db.close());
 
 describe('Feature: Email Confirmation - Success', () => {
   test('Clicking on a Confirmation Email link returns "ok"', async (done) => {
@@ -54,16 +52,6 @@ describe('Feature: Email Confirmation - Success', () => {
     const key = chunks[chunks.length - 1];
     const value = await redis.get(key);
     expect(value).toBeNull();
-    done();
-  });
-});
-
-describe('Feature: Email Confirmation - Failure', () => {
-  test('Clicking on an Invalid Confirmation Email link returns "invalid"', async (done) => {
-    badUrl = `${(<string>process.env.HOST)}/confirm/12345abcde`;
-    const response = await fetch(badUrl);
-    const text = await response.text();
-    expect(text).toEqual('invalid');
     done();
   });
 });

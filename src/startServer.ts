@@ -1,15 +1,18 @@
+import { AddressInfo } from 'net';
+
 import { GraphQLSchema } from 'graphql';
 import { GraphQLServer } from 'graphql-yoga';
 import { importSchema } from 'graphql-import';
 import { mergeSchemas, makeExecutableSchema } from 'graphql-tools';
 
-import * as Redis from 'ioredis';
-
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { User } from './entity/User';
-import { AddressInfo } from 'net';
+import { redis } from './startRedis';
+import { confirmEmail } from './routes/confirmEmail';
+import { Response } from 'express';
+
+// import { createTypeOrmConn } from './utils/createTypeOrmConn';
 
 /**
  * Generate and return a server object
@@ -26,9 +29,6 @@ export const startServer = async () => {
     const typeDefs = importSchema(path.join(__dirname, `./modules/${folder}/schema.graphql`))
     schemas.push(makeExecutableSchema({ resolvers, typeDefs }))
   })
-  
-  // Connect to Redis
-  const redis: Redis.Redis = new Redis();
 
   // Establish new GraphQL Server (graphql-yoga)
   const server= new GraphQLServer({
@@ -42,21 +42,9 @@ export const startServer = async () => {
   });
 
   // Express GET endpoint for Email Confirmation Link
-  server.express.get('/confirm/:id', async (req, res) => {
-    // Retrieve UUID from URL and use to find User ID in Redis
-    const { id } = req.params;
-    const userId = await redis.get(id);
-    if (userId) {
-      // If User ID found, update Postres record to set confirmed to true
-      await User.update({ id: userId }, { confirmed: true });
-      await redis.del(id);
-      // Remove record from Redis and return 'ok'
-      res.send('ok');
-    } else {
-      // If user not found, send 'invalid'
-      res.send('invalid');
-    }
-  });
+  server.express.get('/confirm/:id',
+    confirmEmail,
+    (_, res: Response) => res.send('ok'));
 
   // Start Server and assign server object to const 'app'. Port determined by ENV.
   const app = await server.start({ port: process.env.NODE_ENV === 'test' ? 0 : 4000 });

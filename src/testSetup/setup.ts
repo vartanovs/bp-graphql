@@ -1,17 +1,18 @@
-import { startServer } from "../start-server";
-import { createTypeOrmConn } from "../utils/createTypeOrmConn";
+import { startServer } from "../startServer";
+import { createTypeOrmConn } from "../startTypeOrm";
 
 import { Connection } from 'typeorm';
 import { Server as HttpServer } from 'http';
 import { Server as HttpsServer } from 'https';
 
 // TODO: Specify type for dbConnection
-export let app: HttpServer | HttpsServer;
-export let db: Connection;
+let app: HttpServer | HttpsServer;
+let db: Connection;
 
-export const setup = async () => {
+const setup = async () => {
   app = await startServer();
   db = await createTypeOrmConn();
-  return { app, db }
-  // done();
+  return db;
 };
+
+export { setup, app, db }
