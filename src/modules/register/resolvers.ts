@@ -9,6 +9,7 @@ import GQL from '../../types/schema';
 import { errorMessages } from './errorMessages';
 import { formatYupError } from '../../utils/formatYupError';
 import { createConfirmEmailLink } from '../../utils/createConfirmEmailLink';
+import { sendEmail } from '../../utils/sendEmail';
 
 const SALT = 12;
 
@@ -66,8 +67,15 @@ export const resolvers: ResolverMap = {
       // Save user to database
       await user.save();
 
-      // Create 'Confirm Email Link' to send to user
-      await createConfirmEmailLink(url, user.id, redis);
+      // Create 'Confirm Email' url to send to user
+      const confirmEmailLink = await createConfirmEmailLink(url, user.id, redis);
+
+      // Dispatch confirmation email to user (if not in test environment)
+      if (process.env.NODE_ENV !== 'test') {
+        await sendEmail(email, confirmEmailLink);
+      } else {
+        console.log('Note - Test Env - SparkPost Email Not Sent')
+      }
 
       return null;
     }

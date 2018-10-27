@@ -1,10 +1,10 @@
 # Dependency Directories
 node_modules/
 
-# TypeScript v1 declaration files
+# TypeScript v1 Declaration Files
 typings/
 
-# Dotenv environment variables file
+# Environment Variables File
 .env
 
 # Redis Persistance File

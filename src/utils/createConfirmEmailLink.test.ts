@@ -24,7 +24,6 @@ const mutation = (email: string, password: string) => `mutation {
 }`;
 
 beforeAll(async (done) => {
-  request
   db = await createTypeOrmConn();
   await request(process.env.HOST as string, mutation(goodEmail, goodPassword))  
   const users = await User.find({ where: { goodEmail } });
