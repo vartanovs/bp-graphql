@@ -10,8 +10,8 @@ let db: Connection;
 
 const badEmail = 'test@unregistered.com';
 const badPassword = 'wrongpass';
-const goodEmail = "test@login.com";
-const goodPassword = "secretpass";
+const goodEmail = 'test@login.com';
+const goodPassword = 'secretpass';
 const unconfirmedEmail = 'test@unconfirmed.com';
 const unconfirmedPassword = 'secretpass';
 

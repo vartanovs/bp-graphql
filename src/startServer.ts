@@ -1,13 +1,19 @@
 import { AddressInfo } from 'net';
-
 import { GraphQLServer } from 'graphql-yoga';
+
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import * as session from 'express-session';
+import * as connectRedis from 'connect-redis';
 
 import { redis } from './startRedis';
 import { confirmEmail } from './routes/confirmEmail';
 import { Response } from 'express';
 import { genSchema } from './utils/genSchema';
 
-// import { createTypeOrmConn } from './utils/createTypeOrmConn';
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const RedisStore = connectRedis(session);
 
 /**
  * Generate and return a server object
@@ -21,7 +27,8 @@ export const startServer = async () => {
     // Pass redis and url as context to use in resolver
     context: ({ request }) => ({
       redis,
-      url: request.protocol + '://' + request.get('host')
+      session: request.session,
+      url: request.protocol + '://' + request.get('host'),
     }),
   });
 
@@ -30,8 +37,31 @@ export const startServer = async () => {
     confirmEmail,
     (_, res: Response) => res.send('ok'));
 
+  // Express GET endpoint for Session
+  server.express.use(
+    session({
+      name: 'sessionID',
+      resave: false,
+      saveUninitialized: false,
+      secret: <string>SESSION_SECRET,
+      store: new RedisStore({
+        client: redis as any,
+      }),
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+      }
+    })
+  );
+
+  const cors = {
+    credentials: true,
+    origin: process.env.FRONTEND_HOST,
+  }
+
   // Start Server and assign server object to const 'app'. Port determined by ENV.
-  const app = await server.start({ port: process.env.NODE_ENV === 'test' ? 0 : 4000 });
+  const app = await server.start({ cors, port: process.env.NODE_ENV === 'test' ? 0 : 4000 });
 
   // Extract address object from sever object and log address.port
   const appAddress: AddressInfo | string = app.address();
