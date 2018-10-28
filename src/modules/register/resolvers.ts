@@ -1,4 +1,3 @@
-import * as bcrypt from 'bcryptjs';
 import * as yup from 'yup';
 
 import { ResolverMap } from "../../types/graphql-utils";
@@ -10,8 +9,6 @@ import { errorMessages } from './errorMessages';
 import { formatYupError } from '../../utils/formatYupError';
 import { createConfirmEmailLink } from '../../utils/createConfirmEmailLink';
 import { sendEmail } from '../../utils/sendEmail';
-
-const SALT = 12;
 
 const schema = yup.object().shape({
   email: yup
@@ -58,10 +55,9 @@ export const resolvers: ResolverMap = {
       }
 
       // Hash password and save user to database, return null (no errors)
-      const hashPassword = await bcrypt.hash(password, SALT);
       const user = User.create({
         email,
-        password: hashPassword
+        password,
       });
 
       // Save user to database

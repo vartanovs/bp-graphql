@@ -1,6 +1,7 @@
 import { AddressInfo } from 'net';
 import { GraphQLServer } from 'graphql-yoga';
 
+import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -57,7 +58,7 @@ export const startServer = async () => {
 
   const cors = {
     credentials: true,
-    origin: process.env.FRONTEND_HOST,
+    origin: process.env.NODE_ENV === 'test' ? '*' : <string>process.env.FRONTEND_HOST,
   }
 
   // Start Server and assign server object to const 'app'. Port determined by ENV.
