@@ -12,6 +12,7 @@ import { redis } from './startRedis';
 import { confirmEmail } from './routes/confirmEmail';
 import { Response } from 'express';
 import { genSchema } from './utils/genSchema';
+import { redisSessionPrefix } from './constants';
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const RedisStore = connectRedis(session);
@@ -28,6 +29,7 @@ export const startServer = async () => {
     // Pass redis and url as context to use in resolver
     context: ({ request }) => ({
       redis,
+      request,
       session: request.session,
       url: request.protocol + '://' + request.get('host'),
     }),
@@ -47,6 +49,7 @@ export const startServer = async () => {
       secret: <string>SESSION_SECRET,
       store: new RedisStore({
         client: redis as any,
+        prefix: redisSessionPrefix,
       }),
       cookie: {
         httpOnly: true,

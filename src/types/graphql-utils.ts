@@ -1,13 +1,17 @@
 import { Redis } from "ioredis";
+import { Request } from "express";
+
+export interface Context {
+  redis: Redis,
+  request: Request,
+  url: string,
+  session: Session,
+};
 
 export type Resolver = (
   parent: any,
   args: any,
-  context: {
-    redis: Redis,
-    url: string,
-    session: Session,
-  },
+  context: Context,
   info: any,
   ) => any;
 
@@ -15,11 +19,7 @@ export type GraphQLMiddlewareFunc = (
   resolver: Resolver,
   parent: any,
   args: any,
-  context: {
-    redis: Redis,
-    url: string,
-    session: Session,
-  },
+  context: Context,
   info: any,
   ) => any;
 

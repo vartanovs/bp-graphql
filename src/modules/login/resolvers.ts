@@ -5,6 +5,7 @@ import { User } from '../../entity/User';
 
 import GQL from '../../types/schema';
 import { errorMessages } from './errorMessages';
+import { userSessionIdPrefix } from '../../constants';
 
 const invalidLoginError = [{
   path: 'email',
@@ -19,7 +20,7 @@ export const resolvers: ResolverMap = {
     login: async (
       _,
       { email, password }: GQL.ILoginOnMutationArguments,
-      { session },
+      { session, redis, request},
     ) => {
       const user = await User.findOne({ where: { email } });
 
@@ -36,8 +37,11 @@ export const resolvers: ResolverMap = {
         }];
       }
 
-      // Login Successful > Start Session
+      // Login Successful > Start Session and add to redis array
       session.userId = user.id;
+      if (request.sessionID) {
+        await redis.lpush(`${userSessionIdPrefix}${user.id}`, request.sessionID);
+      }
 
       return null;
     }
