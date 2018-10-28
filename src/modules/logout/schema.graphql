@@ -1,0 +1,10 @@
+# import Error from '../../shared.graphql'
+
+type Mutation {
+  logout: Boolean
+}
+
+# Bug w/graphql-tools - query required for all schemas/resolvers
+type Query {
+  workaround3: String
+}

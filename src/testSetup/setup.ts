@@ -5,7 +5,6 @@ import { Connection } from 'typeorm';
 import { Server as HttpServer } from 'http';
 import { Server as HttpsServer } from 'https';
 
-// TODO: Specify type for dbConnection
 let app: HttpServer | HttpsServer;
 let db: Connection;
 
