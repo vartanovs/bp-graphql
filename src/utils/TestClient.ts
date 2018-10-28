@@ -63,4 +63,36 @@ export class TestClient {
     })
   };
 
+  async sendForgotPasswordEmail(email: string) {
+    return rp.post(this.url, {
+      ...this.options,
+      body: {
+        query: `
+          mutation {
+            sendForgotPasswordEmail(email: "${email}") {
+              path
+              message
+            }
+          }
+        `
+      }
+    });
+  };
+
+  async forgotPasswordChange(newPassword: string, key: string) {
+    return rp.post(this.url, {
+      ...this.options,
+      body: {
+        query: `
+          mutation {
+            forgotPasswordChange(newPassword: "${newPassword}", key: "${key}") {
+              path
+              message
+            }
+          }
+        `
+      }
+    });
+  };
+
 }

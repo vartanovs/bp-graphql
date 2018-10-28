@@ -5,21 +5,19 @@ import { User } from '../../entity/User';
 
 import GQL from '../../types/schema';
 
-import { errorMessages } from './errorMessages';
 import { formatYupError } from '../../utils/formatYupError';
 import { createConfirmEmailLink } from '../../utils/createConfirmEmailLink';
 import { sendEmail } from '../../utils/sendEmail';
+import { errorMessages } from '../../utils/errorMessages';
+import { passwordValidation } from '../../yupSchemas';
 
 const schema = yup.object().shape({
   email: yup
     .string()
-    .min(3, errorMessages.emailTooShort)
+    .min(3, errorMessages.register.emailTooShort)
     .max(255)
-    .email(errorMessages.emailInvalid),
-  password: yup
-    .string()
-    .min(3, errorMessages.passwordTooShort)
-    .max(255)
+    .email(errorMessages.register.emailInvalid),
+  password: passwordValidation,
 });
 
 export const resolvers: ResolverMap = {
@@ -49,7 +47,7 @@ export const resolvers: ResolverMap = {
         return [
           {
             path: 'email',
-            message: errorMessages.duplicateEmail,
+            message: errorMessages.register.duplicateEmail,
           },
         ];
       }

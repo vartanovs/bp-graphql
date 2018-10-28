@@ -1,9 +1,9 @@
 import { User } from '../../entity/User';
 
-import { errorMessages } from './errorMessages';
 import { createTypeOrmConn } from '../../startTypeOrm';
 import { Connection } from 'typeorm';
 import { TestClient } from '../../utils/TestClient';
+import { errorMessages } from '../../utils/errorMessages';
 
 let db: Connection;
 
@@ -35,9 +35,8 @@ describe('Feature: User Registration - Success', () => {
     done();
   });
   test('AND matching user hashed password does not equal clear password', async (done) => {
-    const users = await User.find({ where: { email: goodEmail } });
-    const user = users[0];
-    expect(user.password).not.toEqual(testClient.goodPass);
+    const user = await User.findOne({ where: { email: goodEmail } });
+    expect((<User>user).password).not.toEqual(testClient.goodPass);
     done();
   });
 
@@ -50,7 +49,7 @@ describe('Feature: User Registration - Failure', () => {
     const response = await testClient.mutation('register', goodEmail);
     expect(response.data.register[0]).toEqual({
       path: 'email',
-      message: errorMessages.duplicateEmail,
+      message: errorMessages.register.duplicateEmail,
     });
     done();
   });
@@ -58,7 +57,7 @@ describe('Feature: User Registration - Failure', () => {
     const response: any = await testClient.mutation('register', goodEmail, shortPassword);
     expect(response.data.register[0]).toEqual({
       path: 'password',
-      message: errorMessages.passwordTooShort,
+      message: errorMessages.register.passwordTooShort,
     });
     done();
   });
@@ -67,11 +66,11 @@ describe('Feature: User Registration - Failure', () => {
     expect(response.data.register).toEqual([
       {
         path: 'email',
-        message: errorMessages.emailTooShort,
+        message: errorMessages.register.emailTooShort,
       },
       {
         path: 'email',
-        message: errorMessages.emailInvalid,
+        message: errorMessages.register.emailInvalid,
       },
     ]);
     done();
@@ -81,15 +80,15 @@ describe('Feature: User Registration - Failure', () => {
     expect(response.data.register).toEqual([
       {
         path: 'email',
-        message: errorMessages.emailTooShort,
+        message: errorMessages.register.emailTooShort,
       },
       {
         path: 'email',
-        message: errorMessages.emailInvalid,
+        message: errorMessages.register.emailInvalid,
       },
       {
         path: 'password',
-        message: errorMessages.passwordTooShort,
+        message: errorMessages.register.passwordTooShort,
       },
     ]);
     done();

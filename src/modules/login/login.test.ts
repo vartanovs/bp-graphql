@@ -2,14 +2,15 @@ import { Connection } from "typeorm";
 
 import { createTypeOrmConn } from "../../startTypeOrm";
 import { User } from "../../entity/User";
-import { errorMessages } from "./errorMessages";
 import { TestClient } from "../../utils/TestClient";
+import { errorMessages } from "../../utils/errorMessages";
 
 let db: Connection;
 
 const badEmail = 'test@unregistered.com';
 const badPassword = 'wrongpass';
 const goodEmail = 'test@login.com';
+const lockedEmail = 'test@locked.com';
 const unconfirmedEmail = 'test@unconfirmed.com';
 
 beforeAll(async (done) => {
@@ -23,6 +24,13 @@ beforeAll(async (done) => {
   const user = await User.findOne({ where: { email: goodEmail } });
   const userId = (<User>user).id;
   await User.update({ id: userId }, { confirmed: true });
+
+  // Register, confirm and lock user with email: lockedEmail
+  await testClient.mutation('register', lockedEmail);
+  const lockedUser = await User.findOne({ where: { email: lockedEmail } });
+  const lockedUserId = (<User>lockedUser).id;
+  await User.update({ id: lockedUserId }, { confirmed: true });
+  await User.update({ id: lockedUserId }, { forgotPasswordLocked: true });
 
   // Register (but do not confirm) user with email: unconfirmedEmail
   await testClient.mutation('register', unconfirmedEmail);
@@ -48,7 +56,17 @@ describe('Feature: User Login - Failure', () => {
     expect(response.data.login).toEqual([
       {
         path: 'confirmed',
-        message: errorMessages.unconfirmedEmail,
+        message: errorMessages.login.unconfirmedEmail,
+      },
+    ]);
+    done();
+  });
+  test('AND login with a locked email returns an error', async (done) => {
+    const response = await testClient.mutation('login', lockedEmail);
+    expect(response.data.login).toEqual([
+      {
+        path: 'locked',
+        message: errorMessages.login.lockedAccount,
       },
     ]);
     done();
@@ -58,7 +76,7 @@ describe('Feature: User Login - Failure', () => {
     expect(response.data.login).toEqual([
       {
         path: 'email',
-        message: errorMessages.invalidLogin,
+        message: errorMessages.login.invalidLogin,
       },
     ]);
     done();
@@ -68,7 +86,7 @@ describe('Feature: User Login - Failure', () => {
     expect(response.data.login).toEqual([
       {
         path: 'email',
-        message: errorMessages.invalidLogin,
+        message: errorMessages.login.invalidLogin,
       },
     ]);
     done();

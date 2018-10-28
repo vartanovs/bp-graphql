@@ -6,7 +6,7 @@
   "scripts": {
     "gen-schema-types": "ts-node src/scripts/createTypes.ts",
     "start": "NODE_ENV=dev nodemon --exec ts-node src/index.ts",
-    "test": "NODE_ENV=test jest --detectOpenHandles --runInBand"
+    "test": "NODE_ENV=test jest --runInBand --detectOpenHandles"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,3 @@
-# import Error from '../../shared.graphql'
-
 type Mutation {
   logout: Boolean
 }

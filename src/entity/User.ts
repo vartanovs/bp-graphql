@@ -15,18 +15,21 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column("varchar", { length: 255 })
+  @Column('varchar', { length: 255 })
   email: string;
 
-  @Column("text")
+  @Column('text')
   password: string;
 
-  @Column("boolean", { default: false })
+  @Column('boolean', { default: false })
   confirmed: boolean;
+
+  @Column('boolean', { default: false })
+  forgotPasswordLocked: boolean;
 
   // Hash password before inserting into database
   @BeforeInsert()
-  async hashPassword() {
+  async hashPasswordBeforeInsert() {
     this.password = await bcrypt.hash(this.password, SALT);
   }
 }

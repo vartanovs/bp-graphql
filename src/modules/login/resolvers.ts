@@ -4,12 +4,12 @@ import { ResolverMap } from '../../types/graphql-utils';
 import { User } from '../../entity/User';
 
 import GQL from '../../types/schema';
-import { errorMessages } from './errorMessages';
 import { userSessionIdPrefix } from '../../constants';
+import { errorMessages } from '../../utils/errorMessages';
 
 const invalidLoginError = [{
   path: 'email',
-  message: errorMessages.invalidLogin,
+  message: errorMessages.login.invalidLogin,
 }];
 
 export const resolvers: ResolverMap = {
@@ -33,8 +33,15 @@ export const resolvers: ResolverMap = {
       if (!user.confirmed) {
         return [{
           path: 'confirmed',
-          message: errorMessages.unconfirmedEmail,
+          message: errorMessages.login.unconfirmedEmail,
         }];
+      }
+
+      if (user.forgotPasswordLocked) {
+        return [{
+          path: 'locked',
+          message: errorMessages.login.lockedAccount,
+        }]
       }
 
       // Login Successful > Start Session and add to redis array
