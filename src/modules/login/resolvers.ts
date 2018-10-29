@@ -1,9 +1,9 @@
 import * as bcrypt from 'bcryptjs';
 
-import { ResolverMap } from '../../types/graphql-utils';
+import { ResolverMap } from '../../@types/graphql-utils';
 import { User } from '../../entity/User';
 
-import GQL from '../../types/schema';
+import GQL from '../../@types/schema';
 import { userSessionIdPrefix } from '../../constants';
 import { errorMessages } from '../../utils/errorMessages';
 
@@ -13,23 +13,23 @@ const invalidLoginError = [{
 }];
 
 export const resolvers: ResolverMap = {
-  Query: {
-    workaround2: () => 'workaround2',
-  },
   Mutation: {
     login: async (
       _,
       { email, password }: GQL.ILoginOnMutationArguments,
       { session, redis, request},
     ) => {
+      // Query for user with matching email address
       const user = await User.findOne({ where: { email } });
 
       if (!user) return invalidLoginError;
 
-      const validPass = await bcrypt.compare(password, user.password);
+      // If user found, use bCrypt to confirm valid password
+      const validPass = await bcrypt.compare(password, <string>user.password);
 
       if (!validPass) return invalidLoginError;
 
+      // If user has not yet confirmed their e-mail, return error
       if (!user.confirmed) {
         return [{
           path: 'confirmed',
@@ -37,6 +37,7 @@ export const resolvers: ResolverMap = {
         }];
       }
 
+      // If user account is locked, return error
       if (user.forgotPasswordLocked) {
         return [{
           path: 'locked',

@@ -1,10 +1,10 @@
 import { Connection } from "typeorm";
-import { createTypeOrmConn } from "../../startTypeOrm";
 import { TestClient } from "../../utils/TestClient";
 import { User } from "../../entity/User";
 import { createForgotPasswordLink } from "../../utils/createForgotPasswordLink";
 import { redis } from "../../startRedis";
 import { errorMessages } from "../../utils/errorMessages";
+import { createTestConn } from "../../testUtils/createTestConn";
 
 const goodEmail = 'test@forgotpass.com';
 const newPassword = 'sup3rs3cretp@ss';
@@ -17,7 +17,7 @@ let userId: string;
 
 beforeAll(async(done) => {
   const testClient = new TestClient(<string>process.env.HOST);
-  db = await createTypeOrmConn();
+  db = await createTestConn();
 
   // Register and confirm user with email: goodEmail
   await testClient.mutation('register', goodEmail);

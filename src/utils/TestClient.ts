@@ -2,6 +2,7 @@ import * as rp from 'request-promise';
 import request = require('request');
 
 export class TestClient {
+  // Constructor Types
   goodPass: string;
   url: string;
   options: {
@@ -20,6 +21,7 @@ export class TestClient {
     }
   };
 
+  // Echo Post Request - Returns id and email corresponding with active session
   async echo() {
     return rp.post(this.url, {
       ...this.options,
@@ -36,6 +38,7 @@ export class TestClient {
     })
   };
 
+  // Register / LogIn Post Request (specify 'register' or 'login' with first argument)
   async mutation (type: string, email: string, password: string = this.goodPass) {
     return rp.post(this.url, {
       ...this.options,
@@ -50,6 +53,7 @@ export class TestClient {
     });
   };
 
+  // Logout Post Request - Ends all sessions corresponding with active session
   async logout() {
     return rp.post(this.url, {
       ...this.options,
@@ -63,6 +67,7 @@ export class TestClient {
     })
   };
 
+  // Send Forgotten Password Post Request - Locks account associated with email
   async sendForgotPasswordEmail(email: string) {
     return rp.post(this.url, {
       ...this.options,
@@ -79,6 +84,7 @@ export class TestClient {
     });
   };
 
+  // Forgot Password Change Post Request - Unlocks Account with valid Key and New Password
   async forgotPasswordChange(newPassword: string, key: string) {
     return rp.post(this.url, {
       ...this.options,
@@ -94,5 +100,4 @@ export class TestClient {
       }
     });
   };
-
-}
+};

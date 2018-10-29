@@ -4,16 +4,13 @@ dotenv.config();
 
 import * as SparkPost from 'sparkpost';
 
-const client = new SparkPost(process.env.SPARKPOST_API_KEY);
+// Connect to SparkPost using API key to generate client
+const sparkPostClient = new SparkPost(process.env.SPARKPOST_API_KEY);
 
 export const sendEmail = async (recipient: string, url: string) => {
-  console.log('Recipient: ', recipient);
-  console.log('URL: ', url);
-
-  await client.transmissions.send({
-    options: {
-      sandbox: true,
-    },
+  // Send e-mail to recipient with a link to passed in URL
+  await sparkPostClient.transmissions.send({
+    recipients: [{ address: recipient }],
     content: {
       from: 'testing@sparkpostbox.com',
       subject: 'Confirm Email',
@@ -24,6 +21,8 @@ export const sendEmail = async (recipient: string, url: string) => {
           </body>
         </html>`,
     },
-    recipients: [{ address: recipient }],
+    options: {
+      sandbox: true,
+    },
   });
-}
+};

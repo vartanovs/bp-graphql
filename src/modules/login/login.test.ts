@@ -1,9 +1,9 @@
 import { Connection } from "typeorm";
 
-import { createTypeOrmConn } from "../../startTypeOrm";
 import { User } from "../../entity/User";
 import { TestClient } from "../../utils/TestClient";
 import { errorMessages } from "../../utils/errorMessages";
+import { createTestConn } from "../../testUtils/createTestConn";
 
 let db: Connection;
 
@@ -17,7 +17,7 @@ beforeAll(async (done) => {
   const testClient = new TestClient(<string>process.env.HOST);
 
   // Connect to Type ORM
-  db = await createTypeOrmConn();
+  db = await createTestConn();
 
   // Register and confirm user with email: goodEmail
   await testClient.mutation('register', goodEmail);

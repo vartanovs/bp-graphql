@@ -3,9 +3,9 @@ import fetch from 'node-fetch';
 import { createConfirmEmailLink } from "./createConfirmEmailLink";
 import { User } from "../entity/User";
 import { redis } from '../startRedis';
-import { createTypeOrmConn } from '../startTypeOrm';
 import { Connection } from 'typeorm';
 import { TestClient } from './TestClient';
+import { createTestConn } from '../testUtils/createTestConn';
 
 let db: Connection;
 
@@ -16,7 +16,9 @@ const goodEmail: string = 'test@confirm.com';
 
 beforeAll(async (done) => {
   const testClient = new TestClient(<string>process.env.HOST);
-  db = await createTypeOrmConn();
+  db = await createTestConn();
+
+  // Registeruser with email: goodEmail and store userId
   await testClient.mutation('register', goodEmail);
   const users = await User.find({ where: { goodEmail } });
   userId = users[0].id;

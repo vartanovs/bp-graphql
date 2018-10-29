@@ -18,8 +18,11 @@ export class User extends BaseEntity {
   @Column('varchar', { length: 255 })
   email: string;
 
-  @Column('text')
-  password: string;
+  @Column('text', { nullable: true })
+  password: string | null;
+
+  @Column('text', { nullable: true })
+  googleId: string | null;
 
   @Column('boolean', { default: false })
   confirmed: boolean;
@@ -30,6 +33,8 @@ export class User extends BaseEntity {
   // Hash password before inserting into database
   @BeforeInsert()
   async hashPasswordBeforeInsert() {
-    this.password = await bcrypt.hash(this.password, SALT);
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, SALT);
+    }
   }
 }

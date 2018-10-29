@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 
-import { ResolverMap } from "../../types/graphql-utils";
+import { ResolverMap } from "../../@types/graphql-utils";
 import { User } from '../../entity/User';
 
-import GQL from '../../types/schema';
+import GQL from '../../@types/schema';
 
 import { formatYupError } from '../../utils/formatYupError';
 import { createConfirmEmailLink } from '../../utils/createConfirmEmailLink';
@@ -11,6 +11,7 @@ import { sendEmail } from '../../utils/sendEmail';
 import { errorMessages } from '../../utils/errorMessages';
 import { passwordValidation } from '../../yupSchemas';
 
+// Validate schema for registration email and password inputs
 const schema = yup.object().shape({
   email: yup
     .string()
@@ -21,14 +22,9 @@ const schema = yup.object().shape({
 });
 
 export const resolvers: ResolverMap = {
-  // Bug w/graphql-tools - query required for all schemas/resolvers
-  Query: {
-    workaround: () => 'workaround',
-  },
-
   Mutation: {
     register: async (_, args: GQL.IRegisterOnMutationArguments, { redis, url }) => {
-      // Validate arguments
+      // Validate email and password inputs and throw errors if  invalid
       try {
         await schema.validate(args, {abortEarly: false});
       } catch (err) {
@@ -38,7 +34,7 @@ export const resolvers: ResolverMap = {
       // Destructure email and password from arguments
       const { email, password } = args;
 
-      // Check if user has already registered - if so, return error array
+      // Check if user has already registered - if so, return error
       const userAlreadyExists = await User.findOne({
         where: { email },
         select: ["id"]
@@ -52,14 +48,11 @@ export const resolvers: ResolverMap = {
         ];
       }
 
-      // Hash password and save user to database, return null (no errors)
-      const user = User.create({
+      // Create and save user to database, return null (no errors)
+      const user = await User.create({
         email,
-        password,
-      });
-
-      // Save user to database
-      await user.save();
+        password, // Hash log in User Entity
+      }).save();
 
       // Create 'Confirm Email' url to send to user
       const confirmEmailLink = await createConfirmEmailLink(url, user.id, redis);

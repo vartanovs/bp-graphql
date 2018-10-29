@@ -1,9 +1,9 @@
 import { User } from '../../entity/User';
 
-import { createTypeOrmConn } from '../../startTypeOrm';
 import { Connection } from 'typeorm';
 import { TestClient } from '../../utils/TestClient';
 import { errorMessages } from '../../utils/errorMessages';
+import { createTestConn } from '../../testUtils/createTestConn';
 
 let db: Connection;
 
@@ -13,7 +13,7 @@ const shortEmail = 'ts';
 const shortPassword = 'sp';
 
 beforeAll(async (done) => {
-  db = await createTypeOrmConn();
+  db = await createTestConn();
   done();
 })
 

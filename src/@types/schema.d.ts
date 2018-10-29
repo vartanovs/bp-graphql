@@ -23,11 +23,7 @@ column: number;
 interface IQuery {
 __typename: "Query";
 echo: IUser | null;
-workaround4: string | null;
 hello: string;
-workaround2: string | null;
-workaround3: string | null;
-workaround: string | null;
 }
 
 interface IHelloOnQueryArguments {
@@ -42,7 +38,7 @@ email: string;
 
 interface IMutation {
 __typename: "Mutation";
-sendForgotPasswordEmail: boolean | null;
+sendForgotPasswordEmail: Array<IError | null> | null;
 forgotPasswordChange: Array<IError | null> | null;
 login: Array<IError> | null;
 logout: boolean | null;
