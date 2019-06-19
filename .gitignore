@@ -1,6 +1,9 @@
 # Dependency Directories
 node_modules/
 
+# Dependency Lock
+package-lock.json
+
 # TypeScript v1 Declaration Files
 typings/
 
